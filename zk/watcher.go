@@ -469,6 +469,10 @@ func (w *Watcher) cleanupTree(node string) {
 		return
 	} else if stat.EphemeralOwner != 0 {
 		return
+	} else if stat.Ctime > (time.Now().Unix() - 3600) * 1000 {
+		// Skip the znodes created within last hour to avoid the race with creating
+		// the znode path for new db versions.
+		return
 	}
 
 	for _, child := range children {
